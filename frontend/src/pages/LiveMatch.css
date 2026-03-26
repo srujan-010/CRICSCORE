@@ -1,0 +1,336 @@
+/* LiveMatch.css */
+/* GLOBAL */
+.match-wrapper * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+.match-wrapper {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #020617, #020617, #000);
+  color: white;
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+/* CONTAINER */
+.match-wrapper .match-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 30px;
+}
+
+/* BACK LINK */
+.match-wrapper .back {
+  color: #a3e635;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+.match-wrapper .back:hover {
+  text-decoration: underline;
+}
+
+/* TITLE */
+.match-wrapper .title {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.match-wrapper .subtitle {
+  color: #9ca3af;
+  margin-bottom: 20px;
+}
+
+/* SCORE CARD */
+.match-wrapper .score-card {
+  margin: 30px auto;
+  padding: 40px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+/* SCORE */
+.match-wrapper .score {
+  font-size: 60px;
+  color: #a3e635;
+  margin-bottom: 0px;
+}
+
+/* STATS */
+.match-wrapper .stats {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-top: 20px;
+}
+
+.match-wrapper .label {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 5px;
+}
+
+.match-wrapper .stats p:last-child {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* CONTROLS */
+.match-wrapper .controls {
+  margin-top: 30px;
+}
+
+.match-wrapper .control-title {
+  margin-bottom: 10px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* BUTTON ROW */
+.match-wrapper .btn-row {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+/* BUTTONS */
+.match-wrapper button {
+  padding: 15px 25px;
+  border-radius: 12px;
+  border: none;
+  background: #1f2937;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+}
+
+/* HOVER */
+.match-wrapper button:hover {
+  transform: scale(1.1);
+  background: #a3e635;
+  color: black;
+}
+
+/* SPECIAL BUTTONS */
+.match-wrapper .dot {
+  background: #374151;
+}
+
+.match-wrapper .wicket {
+  background: #7f1d1d;
+}
+
+.match-wrapper .extra {
+  background: #8b5cf6; /* A distinct purple/indigo for extras */
+}
+
+.match-wrapper .reset {
+  background: #111827;
+}
+
+.match-wrapper .undo:hover {
+  background: #fbbf24;
+  color: black;
+}
+
+/* OVERS TRACKER */
+.match-wrapper .overs-tracker {
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 30px auto;
+  max-width: 600px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.match-wrapper .tracker-title {
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+}
+
+.match-wrapper .ball-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.match-wrapper .ball {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1f2937;
+  color: white;
+  font-weight: bold;
+  font-family: inherit;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.match-wrapper .ball-w {
+  background: #7f1d1d;
+  color: white;
+}
+
+.match-wrapper .ball-ex {
+  background: #8b5cf6;
+}
+
+.match-wrapper .history-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(255,255,255,0.1);
+}
+
+.match-wrapper .history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 10px 15px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+}
+
+.match-wrapper .history-label {
+  color: #a3e635;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.match-wrapper .small-balls .ball {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+/* PLAYER STATS MINI */
+.player-stats-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 25px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.batsman, .bowler-mini {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  border: 1px solid transparent;
+}
+
+.batsman:hover, .bowler-mini:hover {
+  background: rgba(163, 230, 53, 0.1);
+  border-color: rgba(163, 230, 53, 0.3);
+}
+
+.batsman.active {
+  background: rgba(163, 230, 53, 0.15);
+  border-color: #a3e635;
+}
+
+.batsman .name, .bowler-mini .name {
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+}
+
+.batsman .val, .bowler-mini .val {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  color: #a3e635;
+  font-size: 16px;
+}
+
+.bowler-mini {
+  margin-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 15px;
+  background: none;
+}
+
+.bowler-mini .label {
+  font-size: 10px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* MODALS */
+.modal-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-card {
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* WARNING CARD */
+.warning-card {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 20px 0;
+  animation: pulse-border 2s infinite;
+  text-align: left;
+}
+
+.warning-card .icon {
+  font-size: 20px;
+}
+
+.warning-card p {
+  color: #fca5a5;
+  font-size: 13px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.warning-card p span {
+  display: block;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
