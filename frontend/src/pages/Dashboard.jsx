@@ -30,7 +30,7 @@ export default function Dashboard() {
   const fetchMatches = async () => {
     if (!token) return;
     try {
-      const res = await axios.get('http://localhost:5000/api/match', {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/match`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMatches(res.data);
@@ -52,7 +52,7 @@ export default function Dashboard() {
         payload.teamAPlayers = teamAPlayerNames.filter(name => name.trim() !== '');
         payload.teamBPlayers = teamBPlayerNames.filter(name => name.trim() !== '');
       }
-      await axios.post('http://localhost:5000/api/match/create', payload, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/match/create`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIsModalOpen(false);
@@ -75,7 +75,7 @@ export default function Dashboard() {
   const handleDeleteMatch = async (id) => {
     if (!window.confirm('Are you sure you want to delete this match permanently?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/match/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/match/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchMatches();

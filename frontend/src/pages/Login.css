@@ -101,6 +101,33 @@
   box-shadow: 0 0 10px #a3e635;
 }
 
+.login-wrapper .password-group {
+  position: relative;
+  width: 100%;
+}
+
+.login-wrapper .toggle-password {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: auto;
+  font-size: 18px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-wrapper .toggle-password:hover {
+  transform: none;
+  box-shadow: none;
+  color: #a3e635;
+}
+
 /* BUTTON */
 .login-wrapper button {
   width: 100%;
@@ -136,4 +163,44 @@
   font-size: 12px;
   color: #9ca3af;
   text-align: center;
+}
+
+/* 📱 MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .login-wrapper .container {
+    flex-direction: column;
+  }
+  .login-wrapper .left {
+    flex: none;
+    height: 40vh;
+    background-position: center;
+  }
+  .login-wrapper .left-content {
+    bottom: 20px;
+    left: 20px;
+  }
+  .login-wrapper .left-content h1 {
+    font-size: 28px;
+  }
+  .login-wrapper .left-content p {
+    font-size: 14px;
+  }
+  .login-wrapper .right {
+    flex: none;
+    padding: 20px;
+  }
+  .login-wrapper .card {
+    width: 100%;
+    max-width: 350px;
+    margin: auto;
+    padding: 25px;
+  }
+  .login-wrapper input {
+    padding: 12px;
+    font-size: 14px;
+  }
+  .login-wrapper button {
+    padding: 14px;
+    font-size: 16px;
+  }
 }

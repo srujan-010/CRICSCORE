@@ -95,6 +95,33 @@
   box-shadow: 0 0 10px #a3e635;
 }
 
+.signup-wrapper .password-group {
+  position: relative;
+  width: 100%;
+}
+
+.signup-wrapper .toggle-password {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: auto;
+  font-size: 18px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-wrapper .toggle-password:hover {
+  transform: none;
+  box-shadow: none;
+  color: #a3e635;
+}
+
 /* BUTTON */
 .signup-wrapper button {
   width: 100%;
@@ -122,4 +149,44 @@
 .signup-wrapper .login-link a {
   color: #a3e635;
   text-decoration: none;
+}
+
+/* 📱 MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .signup-wrapper .container {
+    flex-direction: column;
+  }
+  .signup-wrapper .left {
+    flex: none;
+    height: 40vh;
+    background-position: center;
+  }
+  .signup-wrapper .left-content {
+    bottom: 20px;
+    left: 20px;
+  }
+  .signup-wrapper .left-content h1 {
+    font-size: 28px;
+  }
+  .signup-wrapper .left-content p {
+    font-size: 14px;
+  }
+  .signup-wrapper .right {
+    flex: none;
+    padding: 20px;
+  }
+  .signup-wrapper .card {
+    width: 100%;
+    max-width: 350px;
+    margin: auto;
+    padding: 25px;
+  }
+  .signup-wrapper input {
+    padding: 12px;
+    font-size: 14px;
+  }
+  .signup-wrapper button {
+    padding: 14px;
+    font-size: 16px;
+  }
 }

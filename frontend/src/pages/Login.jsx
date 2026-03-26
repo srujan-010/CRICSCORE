@@ -7,6 +7,7 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -16,7 +17,7 @@ export default function Login() {
       await login(username, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.message);
     }
   };
 
@@ -55,13 +56,22 @@ export default function Login() {
                 onChange={e => setUsername(e.target.value)}
                 required
               />
-              <input 
-                type="password" 
-                placeholder="Enter password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-              />
+              <div className="password-group">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="Enter password" 
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="toggle-password" 
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "👁️‍🗨️" : "👁️"}
+                </button>
+              </div>
 
               <button type="submit">Login</button>
             </form>

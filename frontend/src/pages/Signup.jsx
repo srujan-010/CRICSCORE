@@ -3,20 +3,21 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import './Signup.css';
 
-export default function Signup() {
+const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { signup } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signup(username, password, 'User'); // Defaulting to User, everyone can create but only owners can edit
+      await signup(username, password, 'User');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Signup failed');
+      setError(err.message);
     }
   };
 
@@ -24,56 +25,57 @@ export default function Signup() {
     <div className="signup-wrapper">
       <div className="container">
 
-        {/* LEFT SIDE */}
         <div className="left">
           <div className="overlay"></div>
-
           <div className="left-content">
             <h1>JOIN <span>CRICSCORE</span></h1>
-            <p>Create your account and start scoring live matches with your friends.</p>
+            <p>Create your account and start scoring live matches.</p>
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
         <div className="right">
           <div className="card">
-
             <h2>Sign Up</h2>
-            <p className="subtitle">Create your account</p>
 
-            {error && (
-              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#ef4444', padding: '10px', borderRadius: '5px', marginBottom: '15px', fontSize: '14px', textAlign: 'center' }}>
-                {error}
-              </div>
-            )}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
 
             <form onSubmit={handleSubmit}>
-              <input 
-                type="text" 
-                placeholder="Enter username" 
+              <input
+                type="text"
+                placeholder="Username"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 required
               />
-              <input 
-                type="password" 
-                placeholder="Enter password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-              />
+              <div className="password-group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "👁️‍🗨️" : "👁️"}
+                </button>
+              </div>
 
               <button type="submit">Sign Up</button>
             </form>
 
-            <p className="login-link">
+            <p>
               Already have an account? <Link to="/login">Login</Link>
             </p>
-
           </div>
         </div>
 
       </div>
     </div>
   );
-}
+};
+
+export default Signup;

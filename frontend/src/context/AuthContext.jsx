@@ -35,17 +35,27 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async (username, password) => {
-    const res = await axios.post('http://localhost:5000/api/auth/login', { username, password });
-    setToken(res.data.token);
-    setUser(res.data.user);
-    localStorage.setItem('token', res.data.token);
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, { username, password });
+      setToken(res.data.token);
+      setUser(res.data.user);
+      localStorage.setItem('token', res.data.token);
+    } catch (err) {
+      console.error('Login error:', err.response?.data || err.message);
+      throw new Error(err.response?.data?.error || 'Login failed. Please check your credentials.');
+    }
   };
 
   const signup = async (username, password, role) => {
-    const res = await axios.post('http://localhost:5000/api/auth/signup', { username, password, role });
-    setToken(res.data.token);
-    setUser(res.data.user);
-    localStorage.setItem('token', res.data.token);
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/signup`, { username, password, role });
+      setToken(res.data.token);
+      setUser(res.data.user);
+      localStorage.setItem('token', res.data.token);
+    } catch (err) {
+      console.error('Signup error:', err.response?.data || err.message);
+      throw new Error(err.response?.data?.error || 'Signup failed. Username might already exist.');
+    }
   };
 
   const logout = () => {

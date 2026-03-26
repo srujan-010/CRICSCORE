@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { SocketContext } from '../context/SocketContext';
 import { AuthContext } from '../context/AuthContext';
+import ShareModal from '../components/ShareModal';
 import './LiveMatch.css';
 
 export default function LiveMatch() {
@@ -18,6 +19,7 @@ export default function LiveMatch() {
   const [newPlayerTeam, setNewPlayerTeam] = useState('A'); // New state for team selection
   const [isPlayerSelectOpen, setIsPlayerSelectOpen] = useState(false);
   const [selectingRole, setSelectingRole] = useState(null); // 'striker', 'nonStriker', 'bowler'
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const openSettings = () => {
     setSettings({
@@ -34,7 +36,7 @@ export default function LiveMatch() {
 
   useEffect(() => {
     // Initial fetch
-    axios.get(`http://localhost:5000/api/match/${id}`)
+    axios.get(`${import.meta.env.VITE_API_URL}/api/match/${id}`)
       .then(res => setMatch(res.data))
       .catch(err => console.error(err));
 
@@ -117,19 +119,19 @@ export default function LiveMatch() {
     setSelectingRole(null);
   };
 
+  const hasPlayers = (match?.teamAPlayers?.length > 0 || match?.teamBPlayers?.length > 0);
+
   const updateScore = (type, value) => {
     if (!match || match.status === 'Completed') return;
 
     // MANDATORY PLAYER SELECTION CHECK
-    if (type !== 'reset') {
+    if (type !== 'reset' && hasPlayers) {
       const missing = [];
       if (!match.score.striker) missing.push('Striker');
       if (!match.score.nonStriker) missing.push('Non-Striker');
       if (!match.score.bowler) missing.push('Bowler');
       
       if (missing.length > 0) {
-        // We'll show a UI warning instead of alert
-        // But we still block the update
         return;
       }
     }
@@ -228,12 +230,14 @@ export default function LiveMatch() {
         currentScore.thisOver = [];
         
         // Strike rotation on over end
-        const temp = currentScore.striker;
-        currentScore.striker = currentScore.nonStriker;
-        currentScore.nonStriker = temp;
-        
-        // Clear bowler
-        currentScore.bowler = '';
+        if (hasPlayers) {
+          const temp = currentScore.striker;
+          currentScore.striker = currentScore.nonStriker;
+          currentScore.nonStriker = temp;
+          
+          // Clear bowler
+          currentScore.bowler = '';
+        }
       }
     }
 
@@ -278,10 +282,7 @@ export default function LiveMatch() {
                 <div style={{background:'red', color:'white', fontWeight:'bold', padding:'5px 15px', borderRadius:'20px', fontSize:'12px'}}>MATCH COMPLETED</div>
             )}
             <button 
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Match link copied to clipboard! Share it with others to watch live.");
-              }}
+              onClick={() => setIsShareOpen(true)}
               style={{background: '#1e293b', border: '1px solid #374151', color: 'white', padding: '5px 15px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer'}}
             >
               🔗 Share Match
@@ -300,7 +301,7 @@ export default function LiveMatch() {
           <h2 className="score">{match.score.runs}/{match.score.wickets}</h2>
           
           {/* MISSING PLAYERS WARNING */}
-          {match.createdBy === user?.id && match.status !== 'Completed' && (
+          {hasPlayers && match.createdBy === user?.id && match.status !== 'Completed' && (
             (() => {
               const missing = [];
               if (!match.score.striker) missing.push('Striker');
@@ -319,43 +320,45 @@ export default function LiveMatch() {
             })()
           )}
 
-          <div className="player-stats-mini">
-            <div className={`batsman ${match.score.striker ? 'active' : ''}`} onClick={() => { setSelectingRole('striker'); setIsPlayerSelectOpen(true); }}>
-              <span className="name">{match.score.striker || 'Select Striker'}*</span>
-              <span className="val">
-                {(() => {
-                  const p = match.score.players?.find(pl => pl.name === match.score.striker);
-                  return p ? `${p.runs}(${p.balls})` : '0(0)';
-                })()}
-              </span>
+          {hasPlayers && (
+            <div className="player-stats-mini">
+              <div className={`batsman ${match.score.striker ? 'active' : ''}`} onClick={() => { setSelectingRole('striker'); setIsPlayerSelectOpen(true); }}>
+                <span className="name">{match.score.striker || 'Select Striker'}*</span>
+                <span className="val">
+                  {(() => {
+                    const p = match.score.players?.find(pl => pl.name === match.score.striker);
+                    return p ? `${p.runs}(${p.balls})` : '0(0)';
+                  })()}
+                </span>
+              </div>
+              <div className={`batsman ${match.score.nonStriker ? 'active' : ''}`} onClick={() => { setSelectingRole('nonStriker'); setIsPlayerSelectOpen(true); }}>
+                <span className="name">{match.score.nonStriker || 'Select Non-Striker'}</span>
+                <span className="val">
+                  {(() => {
+                    const p = match.score.players?.find(pl => pl.name === match.score.nonStriker);
+                    return p ? `${p.runs}(${p.balls})` : '0(0)';
+                  })()}
+                </span>
+              </div>
+              <div className="bowler-mini" onClick={() => { 
+                  if (match.score.thisOver && match.score.thisOver.length > 0) {
+                      alert("⚠️ Cannot change bowler mid-over. Complete the over first!");
+                      return;
+                  }
+                  setSelectingRole('bowler'); 
+                  setIsPlayerSelectOpen(true); 
+              }}>
+                <span className="label">BOWLER:</span>
+                <span className="name">{match.score.bowler || 'Select Bowler'}</span>
+                <span className="val">
+                  {(() => {
+                    const p = match.score.players?.find(pl => pl.name === match.score.bowler);
+                    return p ? `${match.score.oversHistory?.filter(o => o.bowler === p.name).length || 0}.${match.score.balls}-${p.bowlingRuns}-${p.wickets}` : '0.0-0-0';
+                  })()}
+                </span>
+              </div>
             </div>
-            <div className={`batsman ${match.score.nonStriker ? 'active' : ''}`} onClick={() => { setSelectingRole('nonStriker'); setIsPlayerSelectOpen(true); }}>
-              <span className="name">{match.score.nonStriker || 'Select Non-Striker'}</span>
-              <span className="val">
-                {(() => {
-                  const p = match.score.players?.find(pl => pl.name === match.score.nonStriker);
-                  return p ? `${p.runs}(${p.balls})` : '0(0)';
-                })()}
-              </span>
-            </div>
-            <div className="bowler-mini" onClick={() => { 
-                if (match.score.thisOver && match.score.thisOver.length > 0) {
-                    alert("⚠️ Cannot change bowler mid-over. Complete the over first!");
-                    return;
-                }
-                setSelectingRole('bowler'); 
-                setIsPlayerSelectOpen(true); 
-            }}>
-              <span className="label">BOWLER:</span>
-              <span className="name">{match.score.bowler || 'Select Bowler'}</span>
-              <span className="val">
-                {(() => {
-                  const p = match.score.players?.find(pl => pl.name === match.score.bowler);
-                  return p ? `${match.score.oversHistory?.filter(o => o.bowler === p.name).length || 0}.${match.score.balls}-${p.bowlingRuns}-${p.wickets}` : '0.0-0-0';
-                })()}
-              </span>
-            </div>
-          </div>
+          )}
 
           {target && (
             <p style={{color: '#a3e635', fontWeight: 'bold', marginTop: '10px'}}>
@@ -397,7 +400,7 @@ export default function LiveMatch() {
         </div>
 
         {/* ADD PLAYER BUTTON */}
-        {match.createdBy === user?.id && match.status !== 'Completed' && (
+        {hasPlayers && match.createdBy === user?.id && match.status !== 'Completed' && (
           <div style={{display:'flex', justifyContent:'center', marginBottom: '20px'}}>
             <button 
               onClick={() => setIsAddPlayerOpen(true)}
@@ -580,68 +583,70 @@ export default function LiveMatch() {
         )}
 
         {/* DETAILED SCORECARD */}
-        <div style={{marginTop:'30px', background:'rgba(255,255,255,0.05)', borderRadius:'20px', padding:'20px'}}>
-          <h3 style={{color:'#a3e635', marginBottom:'20px'}}>Full Scorecard</h3>
-          
-          <div className="batting-table" style={{width:'100%', overflowX:'auto', marginBottom: '30px'}}>
-            <table style={{width:'100%', textAlign:'left', color:'white', borderCollapse:'collapse'}}>
-              <thead>
-                <tr style={{borderBottom:'1px solid #374151', color:'#9ca3af', fontSize:'12px'}}>
-                  <th style={{padding:'10px'}}>BATSMAN</th>
-                  <th style={{padding:'10px'}}>R</th>
-                  <th style={{padding:'10px'}}>B</th>
-                  <th style={{padding:'10px'}}>4s</th>
-                  <th style={{padding:'10px'}}>6s</th>
-                  <th style={{padding:'10px'}}>SR</th>
-                </tr>
-              </thead>
-              <tbody>
-                {match.score.players?.filter(p => p.runs > 0 || p.balls > 0 || p.isOut).map((p, i) => (
-                  <tr key={i} style={{borderBottom:'1px solid #1f2937'}}>
-                    <td style={{padding:'10px'}}>
-                      <div style={{fontWeight:'bold'}}>{p.name} {p.name === match.score.striker || p.name === match.score.nonStriker ? '*' : ''}</div>
-                      <div style={{fontSize:'11px', color:'#9ca3af'}}>
-                        {p.isOut ? (p.dismissedBy ? `c & b ${p.dismissedBy}` : 'Out') : 'not out'}
-                      </div>
-                    </td>
-                    <td style={{padding:'10px'}}>{p.runs}</td>
-                    <td style={{padding:'10px'}}>{p.balls}</td>
-                    <td style={{padding:'10px'}}>{p.fours || 0}</td>
-                    <td style={{padding:'10px'}}>{p.sixes || 0}</td>
-                    <td style={{padding:'10px'}}>{p.balls > 0 ? ((p.runs/p.balls)*100).toFixed(1) : '0.0'}</td>
+        {hasPlayers && (
+          <div style={{marginTop:'30px', background:'rgba(255,255,255,0.05)', borderRadius:'20px', padding:'20px'}}>
+            <h3 style={{color:'#a3e635', marginBottom:'20px'}}>Full Scorecard</h3>
+            
+            <div className="batting-table" style={{width:'100%', overflowX:'auto', marginBottom: '30px'}}>
+              <table style={{width:'100%', textAlign:'left', color:'white', borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{borderBottom:'1px solid #374151', color:'#9ca3af', fontSize:'12px'}}>
+                    <th style={{padding:'10px'}}>BATSMAN</th>
+                    <th style={{padding:'10px'}}>R</th>
+                    <th style={{padding:'10px'}}>B</th>
+                    <th style={{padding:'10px'}}>4s</th>
+                    <th style={{padding:'10px'}}>6s</th>
+                    <th style={{padding:'10px'}}>SR</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {match.score.players?.filter(p => p.runs > 0 || p.balls > 0 || p.isOut).map((p, i) => (
+                    <tr key={i} style={{borderBottom:'1px solid #1f2937'}}>
+                      <td style={{padding:'10px'}}>
+                        <div style={{fontWeight:'bold'}}>{p.name} {p.name === match.score.striker || p.name === match.score.nonStriker ? '*' : ''}</div>
+                        <div style={{fontSize:'11px', color:'#9ca3af'}}>
+                          {p.isOut ? (p.dismissedBy ? `c & b ${p.dismissedBy}` : 'Out') : 'not out'}
+                        </div>
+                      </td>
+                      <td style={{padding:'10px'}}>{p.runs}</td>
+                      <td style={{padding:'10px'}}>{p.balls}</td>
+                      <td style={{padding:'10px'}}>{p.fours || 0}</td>
+                      <td style={{padding:'10px'}}>{p.sixes || 0}</td>
+                      <td style={{padding:'10px'}}>{p.balls > 0 ? ((p.runs/p.balls)*100).toFixed(1) : '0.0'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          <div className="bowling-table" style={{width:'100%', overflowX:'auto'}}>
-            <table style={{width:'100%', textAlign:'left', color:'white', borderCollapse:'collapse'}}>
-              <thead>
-                <tr style={{borderBottom:'1px solid #374151', color:'#9ca3af', fontSize:'12px'}}>
-                  <th style={{padding:'10px'}}>BOWLER</th>
-                  <th style={{padding:'10px'}}>O</th>
-                  <th style={{padding:'10px'}}>M</th>
-                  <th style={{padding:'10px'}}>R</th>
-                  <th style={{padding:'10px'}}>W</th>
-                  <th style={{padding:'10px'}}>ECON</th>
-                </tr>
-              </thead>
-              <tbody>
-                {match.score.players?.filter(p => p.overs > 0 || p.bowlingRuns > 0 || p.wickets > 0).map((p, i) => (
-                  <tr key={i} style={{borderBottom:'1px solid #1f2937'}}>
-                    <td style={{padding:'10px', fontWeight:'bold'}}>{p.name} {p.name === match.score.bowler ? '*' : ''}</td>
-                    <td style={{padding:'10px'}}>{p.overs}</td>
-                    <td style={{padding:'10px'}}>{p.maidens || 0}</td>
-                    <td style={{padding:'10px'}}>{p.bowlingRuns}</td>
-                    <td style={{padding:'10px'}}>{p.wickets}</td>
-                    <td style={{padding:'10px'}}>{p.overs > 0 ? (p.bowlingRuns/p.overs).toFixed(2) : '0.00'}</td>
+            <div className="bowling-table" style={{width:'100%', overflowX:'auto'}}>
+              <table style={{width:'100%', textAlign:'left', color:'white', borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{borderBottom:'1px solid #374151', color:'#9ca3af', fontSize:'12px'}}>
+                    <th style={{padding:'10px'}}>BOWLER</th>
+                    <th style={{padding:'10px'}}>O</th>
+                    <th style={{padding:'10px'}}>M</th>
+                    <th style={{padding:'10px'}}>R</th>
+                    <th style={{padding:'10px'}}>W</th>
+                    <th style={{padding:'10px'}}>ECON</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {match.score.players?.filter(p => p.overs > 0 || p.bowlingRuns > 0 || p.wickets > 0).map((p, i) => (
+                    <tr key={i} style={{borderBottom:'1px solid #1f2937'}}>
+                      <td style={{padding:'10px', fontWeight:'bold'}}>{p.name} {p.name === match.score.bowler ? '*' : ''}</td>
+                      <td style={{padding:'10px'}}>{p.overs}</td>
+                      <td style={{padding:'10px'}}>{p.maidens || 0}</td>
+                      <td style={{padding:'10px'}}>{p.bowlingRuns}</td>
+                      <td style={{padding:'10px'}}>{p.wickets}</td>
+                      <td style={{padding:'10px'}}>{p.overs > 0 ? (p.bowlingRuns/p.overs).toFixed(2) : '0.00'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* SELECT PLAYER ROLE MODAL */}
         {isPlayerSelectOpen && (
@@ -698,6 +703,12 @@ export default function LiveMatch() {
         )}
 
       </div>
+
+      <ShareModal 
+        isOpen={isShareOpen} 
+        onClose={() => setIsShareOpen(false)} 
+        shareUrl={window.location.href} 
+      />
     </div>
   );
 }
